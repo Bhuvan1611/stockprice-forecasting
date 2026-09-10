@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}About — The Ledger{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="kicker">how this works</div>
+  <h1>What's actually happening<br />under the hood.</h1>
+</section>
+
+<section class="panel">
+  <h2>The model</h2>
+  <p>An LSTM neural network trained on daily closing prices. It looks at the last 100 trading
+    days and predicts the next one. For a forecast, that prediction gets fed back in as if it
+    were real, and the model predicts the day after that — repeated for however many days you
+    ask for.</p>
+  <p class="disclaimer">Because each forecast day depends on the model's own earlier guesses,
+    accuracy degrades the further out you look. Treat long forecasts as illustrative, not reliable,
+    and never as financial advice.</p>
+</section>
+
+<section class="panel">
+  <h2>How accuracy is measured</h2>
+  <p>The most recent 30% of a ticker's history is held out and never shown to the model during
+    that run. RMSE, MAE, and MAPE describe the average size of the miss between the model's
+    prediction and the real closing price, in price units and in percentage terms. R² describes
+    how much of the price movement the model's predictions explain, on a scale up to 1.0.</p>
+</section>
+
+<section class="panel">
+  <h2>Indicators shown alongside the forecast</h2>
+  <p><strong>EMA (exponential moving average)</strong> smooths price action, weighting recent
+    days more heavily. <strong>RSI (relative strength index)</strong> measures how fast and how
+    far price has moved recently, on a 0–100 scale, with readings above 70 or below 30
+    conventionally read as overbought or oversold. <strong>MACD</strong> tracks the relationship
+    between two EMAs and is often used to spot momentum shifts. <strong>Bollinger bands</strong>
+    plot a moving average with bands two standard deviations above and below it, widening and
+    narrowing with volatility.</p>
+</section>
+
+<section class="panel">
+  <h2>Data &amp; limits</h2>
+  <p>Price history and headlines come from Yahoo Finance via the <code>yfinance</code> library.
+    Downloads are cached for six hours so repeated runs on the same ticker don't re-fetch data.
+    The model is univariate — it only ever sees closing price, not volume, news, or fundamentals.</p>
+</section>
+{% endblock %}

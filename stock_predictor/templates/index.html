@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Predict — The Ledger{% endblock %}
+{% block head %}
+<script src="https://cdn.plot.ly/plotly-2.32.0.min.js" charset="utf-8"></script>
+{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="kicker">lstm price forecasting</div>
+  <h1>Forecast where a stock<br />might drift next.</h1>
+  <p class="lead">Enter a ticker to backtest a trained LSTM model against real history, then
+    project the next 1–90 trading days forward.</p>
+
+  <form method="POST" data-loading style="margin-top: 24px;">
+    <div class="form-row">
+      <div class="field">
+        <label for="stock">Ticker symbol</label>
+        <input type="text" id="stock" name="stock" placeholder="e.g. AAPL, RELIANCE.NS, ^NSEI"
+               value="{{ stock }}" autocomplete="off" required />
+      </div>
+      <div class="field">
+        <label for="forecast_days">Forecast days: <span id="days-out">{{ forecast_days }}</span></label>
+        <input type="range" id="forecast_days" name="forecast_days" min="1" max="90"
+               value="{{ forecast_days }}"
+               oninput="document.getElementById('days-out').textContent = this.value" />
+      </div>
+      <button type="submit">Run prediction</button>
+    </div>
+  </form>
+
+  <div class="chip-row">
+    {% for t in popular_tickers %}
+    <button type="button" class="chip" data-chip="{{ t.symbol }}" data-target="#stock">{{ t.label }}</button>
+    {% endfor %}
+  </div>
+</section>
+
+{% if error %}
+<section class="panel">
+  <div class="alert">{{ error }}</div>
+</section>
+{% endif %}
+
+{% if metrics %}
+<section class="panel">
+  <div class="panel-title-row">
+    <h2>Backtest accuracy — {{ stock }}</h2>
+    <button type="button" class="btn btn-outline btn-small" data-watchlist-add="{{ stock }}">+ Watchlist</button>
+  </div>
+  <div class="metrics-row">
+    <div class="metric-cell"><div class="label">RMSE</div><div class="value mono">{{ "%.2f"|format(metrics.rmse) }}</div></div>
+    <div class="metric-cell"><div class="label">MAE</div><div class="value mono">{{ "%.2f"|format(metrics.mae) }}</div></div>
+    <div class="metric-cell"><div class="label">MAPE</div><div class="value mono">{{ "%.2f"|format(metrics.mape) }}%</div></div>
+    <div class="metric-cell"><div class="label">R²</div><div class="value mono">{{ "%.3f"|format(metrics.r2) }}</div></div>
+  </div>
+  <p class="disclaimer">Measured on the held-out 30% of history the model never trained on. Lower RMSE/MAE/MAPE and higher R² mean a tighter fit — not a guarantee of future accuracy.</p>
+</section>
+
+<section class="panel">
+  <h2>Candlestick</h2>
+  {{ candlestick_chart|safe }}
+</section>
+
+<section class="panel">
+  <h2>Moving averages</h2>
+  {{ ema_chart|safe }}
+</section>
+
+<section class="panel">
+  <h2>Technical indicators</h2>
+  {{ indicator_chart|safe }}
+</section>
+
+<section class="panel">
+  <h2>Prediction &amp; forecast</h2>
+  {{ prediction_chart|safe }}
+</section>
+
+<section class="panel grid-2">
+  <div>
+    <h2>Forecast table</h2>
+    <div class="table-wrap" style="max-height: 360px; overflow-y: auto;">
+      {{ forecast_table|safe }}
+    </div>
+    <div class="chip-row" style="margin-top: 14px;">
+      <a class="btn btn-outline btn-small" href="{{ url_for('download_file', filename=dataset_link) }}">Download dataset CSV</a>
+      <a class="btn btn-outline btn-small" href="{{ url_for('download_file', filename=forecast_link) }}">Download forecast CSV</a>
+    </div>
+  </div>
+  <div>
+    <h2>Latest headlines</h2>
+    {% if news %}
+    <ul class="news-list">
+      {% for item in news %}
+      <li>
+        <a href="{{ item.link }}" target="_blank" rel="noopener">{{ item.title }}</a><br />
+        <span class="source">{{ item.publisher }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="empty">No recent headlines found for this ticker.</div>
+    {% endif %}
+  </div>
+</section>
+
+<section class="panel">
+  <h2>Price history summary</h2>
+  <div class="table-wrap">{{ data_desc|safe }}</div>
+</section>
+
+{% elif not error %}
+<section class="panel">
+  <div class="empty">Run a ticker above to see the backtest, charts, and forecast.</div>
+</section>
+{% endif %}
+{% endblock %}

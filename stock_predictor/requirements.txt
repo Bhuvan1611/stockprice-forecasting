@@ -1,0 +1,10 @@
+Flask==3.0.3
+Flask-Session==0.8.0
+yfinance==0.2.44
+pandas==2.2.2
+numpy==1.26.4
+scikit-learn==1.5.1
+plotly==5.24.1
+tensorflow==2.16.1
+Werkzeug==3.0.4
+gunicorn==22.0.0

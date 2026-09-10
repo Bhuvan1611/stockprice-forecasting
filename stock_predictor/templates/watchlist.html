@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Watchlist — The Ledger{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="kicker">saved for later</div>
+  <h1>Your watchlist.</h1>
+  <p class="lead">Saved on this device only — there's no account system, so it lives in your session.
+    Add a ticker below, or use the "+ Watchlist" button after running a prediction.</p>
+
+  <form method="POST" data-loading style="margin-top: 24px;">
+    <div class="form-row">
+      <div class="field">
+        <label for="stock">Add ticker</label>
+        <input type="text" id="stock" name="stock" placeholder="e.g. TCS.NS" required />
+      </div>
+      <button type="submit">Add</button>
+    </div>
+  </form>
+</section>
+
+<section class="panel">
+  {% if quotes %}
+    {% for q in quotes %}
+    <div class="watch-row">
+      <span class="sym">{{ q.symbol }}</span>
+      <span class="mono">
+        {% if q.price is not none %}
+          {{ "%.2f"|format(q.price) }}
+          <span class="{{ 'up' if q.up else 'down' }}" style="color: {{ 'var(--gain)' if q.up else 'var(--loss)' }};">
+            {{ '▲' if q.up else '▼' }} {{ "%.2f"|format(q.change_pct|abs) }}%
+          </span>
+        {% else %}
+          <span class="mono" style="color: var(--ink-soft);">quote unavailable</span>
+        {% endif %}
+      </span>
+      <div class="watch-actions">
+        <a class="btn btn-outline btn-small" href="{{ url_for('index', stock=q.symbol) }}">Run prediction</a>
+        <button type="button" class="btn btn-danger btn-small" data-watchlist-remove="{{ q.symbol }}">Remove</button>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <div class="empty">Your watchlist is empty. Add a ticker above to start tracking it.</div>
+  {% endif %}
+</section>
+{% endblock %}

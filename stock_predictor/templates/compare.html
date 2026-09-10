@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Compare — The Ledger{% endblock %}
+{% block head %}
+<script src="https://cdn.plot.ly/plotly-2.32.0.min.js" charset="utf-8"></script>
+{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="kicker">side-by-side</div>
+  <h1>Compare two tickers.</h1>
+  <p class="lead">Run the same backtest and forecast on two symbols at once, and see how their
+    recent performance stacks up on a common scale.</p>
+
+  <form method="POST" data-loading style="margin-top: 24px;">
+    <div class="form-row">
+      <div class="field">
+        <label for="stock_a">Ticker A</label>
+        <input type="text" id="stock_a" name="stock_a" value="{{ stock_a }}" required />
+      </div>
+      <div class="field">
+        <label for="stock_b">Ticker B</label>
+        <input type="text" id="stock_b" name="stock_b" value="{{ stock_b }}" required />
+      </div>
+      <div class="field">
+        <label for="forecast_days">Forecast days: <span id="days-out">{{ forecast_days }}</span></label>
+        <input type="range" id="forecast_days" name="forecast_days" min="1" max="90"
+               value="{{ forecast_days }}"
+               oninput="document.getElementById('days-out').textContent = this.value" />
+      </div>
+      <button type="submit">Compare</button>
+    </div>
+  </form>
+</section>
+
+{% if error %}
+<section class="panel"><div class="alert">{{ error }}</div></section>
+{% endif %}
+
+{% if results %}
+<section class="panel">
+  <h2>Relative performance</h2>
+  {{ comparison_chart|safe }}
+</section>
+
+<section class="panel">
+  <h2>Metrics side by side</h2>
+  <div class="compare-grid">
+    {% for r in results %}
+    <div>
+      <h3>{{ r.ticker }}</h3>
+      <table class="table" style="width: 100%;">
+        <tr><td>Last close</td><td>{{ "%.2f"|format(r.last_close) }}</td></tr>
+        <tr><td>Forecast, end of horizon</td><td>{{ "%.2f"|format(r.forecast_end) }}</td></tr>
+        <tr><td>RMSE</td><td>{{ "%.2f"|format(r.metrics.rmse) }}</td></tr>
+        <tr><td>MAE</td><td>{{ "%.2f"|format(r.metrics.mae) }}</td></tr>
+        <tr><td>MAPE</td><td>{{ "%.2f"|format(r.metrics.mape) }}%</td></tr>
+        <tr><td>R²</td><td>{{ "%.3f"|format(r.metrics.r2) }}</td></tr>
+      </table>
+      <div class="chip-row" style="margin-top: 12px;">
+        <button type="button" class="btn btn-outline btn-small" data-watchlist-add="{{ r.ticker }}">+ Watchlist</button>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% elif not error %}
+<section class="panel">
+  <div class="empty">Enter two tickers above to compare their recent performance and forecasts.</div>
+</section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}The Ledger — stock forecasting{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <div>Running the model&hellip;</div>
+  </div>
+
+  <header class="site-header">
+    <div class="shell nav-row">
+      <a class="brand plain" href="{{ url_for('index') }}">The Ledger <small>LSTM forecasting</small></a>
+      <nav class="site-nav">
+        <a href="{{ url_for('index') }}" class="{{ 'active' if request.endpoint == 'index' else '' }}">Predict</a>
+        <a href="{{ url_for('compare') }}" class="{{ 'active' if request.endpoint == 'compare' else '' }}">Compare</a>
+        <a href="{{ url_for('watchlist') }}" class="{{ 'active' if request.endpoint == 'watchlist' else '' }}">Watchlist{% if watchlist %} ({{ watchlist|length }}){% endif %}</a>
+        <a href="{{ url_for('about') }}" class="{{ 'active' if request.endpoint == 'about' else '' }}">About</a>
+        <button type="button" class="theme-toggle" data-theme-toggle>Dark mode</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="tape-wrap">
+    <div class="tape" id="ticker-tape">Loading market snapshot&hellip;</div>
+  </div>
+
+  <main class="shell">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell">
+      Educational project — forecasts are model output, not financial advice. Data via Yahoo Finance.
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
