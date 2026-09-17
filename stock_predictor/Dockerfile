@@ -10,4 +10,4 @@ COPY . .
 ENV FLASK_DEBUG=0
 EXPOSE 5000
 
-CMD ["gunicorn", "-b", "0.0.0.0:5000", "-w", "2", "--timeout", "120", "app:app"]
+CMD ["sh", "-c", "exec gunicorn --bind 0.0.0.0:${PORT:-10000} -w 2 --timeout 120 app:app"]
