@@ -1,6 +1,6 @@
 Flask==3.0.3
 Flask-Session==0.8.0
-yfinance==0.2.44
+yfinance==1.6.0
 pandas==2.2.2
 numpy==1.26.4
 scikit-learn==1.5.1
