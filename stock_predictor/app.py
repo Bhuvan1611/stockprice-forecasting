@@ -12,6 +12,8 @@ import os
 import time
 import uuid
 import datetime as dt
+import yfinance as yf
+print(f"STARTUP: yfinance version = {yf.__version__}", flush=True)
 
 import numpy as np
 import pandas as pd
